@@ -1,24 +1,38 @@
 FROM debian:bookworm
 
-RUN apt update && apt install nginx -y
+#	Update and install NGINX + OpenSSL
+RUN apt update && apt install -y \
+	nginx \
+	openssl \
+	vim \
+	curl
 
-# Install tools
-RUN apt install vim -y && apt install curl -y
-
-# Creates a private RSA key and TSL certificate
+# 	Creates directory for SSL certificates
 RUN mkdir -p /etc/nginx/ssl
-RUN apt install openssl -y
-RUN openssl req -x509 -noenc -days 365 -newkey rsa:2048 \
-    -keyout /etc/nginx/ssl/inception.key \
-    -out /etc/nginx/ssl/inception.crt \
-    -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=annabrag.42.fr/UID=annabrag"
-RUN chmod 600 /etc/nginx/ssl/inception.key
 
-# Create an NGINX directory to store its config files
+#	Generate self-signed SSL certificate
+RUN openssl req -x509 -noenc -days 365 -newkey rsa:2048 \
+    -keyout /etc/nginx/ssl/nginx.key \
+    -out /etc/nginx/ssl/nginx.crt \
+    -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=annabrag.42.fr/UID=annabrag"
+
+#	Set proper permissions
+RUN chmod 600 /etc/nginx/ssl/nginx.key \
+	&& chmod 644 /etc/nginx/ssl/nginx.crt
+
+#	Create an NGINX directory to store its config files
 RUN mkdir -p /var/run/nginx
 
-# Copy the customized config file from the host and put it into the container image
+#	Copy custom NGINX config from the host and put it into the container image
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
-# Sets config on the image that indicates a port the image would like to expose
-#EXPOSE 9000
+RUN chmod 755 /var/www/html
+
+#	Recursive ownership changes 
+RUN chown -R www-data:www-data /var/www/html
+
+#	Expose HTTPS port only
+EXPOSE 443
+
+#	Start NGINX in foreground (no daemon mode)
+CMD ["nginx", "-g", "daemon off;"]
