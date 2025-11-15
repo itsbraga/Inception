@@ -2,26 +2,19 @@
 
 #	Basic Settings
 user		= mysql
-#basedir		= /usr
+basedir		= /usr
 datadir		= /var/lib/mysql
-#pid-file	= /run/mysqld/mysqld.pid
+pid-file	= /run/mysqld/mysqld.pid
 socket		= /run/mysqld/mysqld.sock
 
-#   localhost is more compatible and is not less secure
-bind-address			= 127.0.0.1
+#	0.0.0.0 ---> All interfaces
+bind-address			= 0.0.0.0
 
 #	Fine Tuning
 #key_buffer_size		= 128M
 #max_allowed_packet		= 1G
 #thread_stack			= 192K
 #thread_cache_size		= 8
-
-#   Logging and Replication
-#
-#   Note: The configured log file or its directory need to be created
-#   and be writable by the mysql user, e.g.
-# $ sudo mkdir -m 2750 /var/log/mysql
-# $ sudo chown mysql /var/log/mysql
 
 #	Character sets
 #

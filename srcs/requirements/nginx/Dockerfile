@@ -1,7 +1,8 @@
+#	Indicates which OS the virtual machine should run on
 FROM debian:bookworm
 
 #	Update and install NGINX + OpenSSL
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
 	nginx \
 	openssl \
 	vim \
@@ -34,5 +35,6 @@ RUN chown -R www-data:www-data /var/www/html
 #	Expose HTTPS port only
 EXPOSE 443
 
-#	Start NGINX in foreground (no daemon mode)
-# CMD ["nginx", "-g", "daemon off;"]
+#	Defines the default (suggestion) command to execute when a container starts up
+#	In this case: starts NGINX in foreground (no daemon mode)
+CMD [ "nginx", "-g", "daemon off;" ]

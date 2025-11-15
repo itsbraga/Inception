@@ -20,7 +20,7 @@ HOT_PINK	:=	\e[38;2;255;105;180m
 
 DOCKER_COMPOSE_F	=	srcs/docker-compose.yml
 DOCKER_COMPOSE		=	docker compose -f $(DOCKER_COMPOSE_F)
-DATA_PATH			=	/home/artemis/data
+DATA_PATH			=	/home/annabrag/data
 
 #******************************************************************************#
 #	RULES
@@ -29,8 +29,8 @@ DATA_PATH			=	/home/artemis/data
 all:	up
 
 setup:
-		@sudo mkdir -p $(DATA_PATH)/mariadb
-		@sudo mkdir -p $(DATA_PATH)/wordpress
+		@mkdir -p $(DATA_PATH)/mariadb
+		@mkdir -p $(DATA_PATH)/wordpress
 
 #	-d, --detach: Run containers in the background
 #	--build: Build images before starting containers
