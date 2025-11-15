@@ -20,7 +20,7 @@ HOT_PINK	:=	\e[38;2;255;105;180m
 
 DOCKER_COMPOSE_F	=	srcs/docker-compose.yml
 DOCKER_COMPOSE		=	docker compose -f $(DOCKER_COMPOSE_F)
-DATA_PATH			=	/home/annabrag/data
+DATA_PATH			=	/home/artemis/data
 
 #******************************************************************************#
 #	RULES
@@ -29,8 +29,8 @@ DATA_PATH			=	/home/annabrag/data
 all:	up
 
 setup:
-		@mkdir -p $(DATA_PATH)/mariadb
-		@mkdir -p $(DATA_PATH)/wordpress
+		@sudo mkdir -p $(DATA_PATH)/mariadb
+		@sudo mkdir -p $(DATA_PATH)/wordpress
 
 #	-d, --detach: Run containers in the background
 #	--build: Build images before starting containers
@@ -43,13 +43,12 @@ down:
 		@printf "$(BOLD)$(P_ORANGE)[down] $(RESET)Stopped containers\n\n"
 
 clean:
-		@$(DOCKER_COMPOSE) down -v
+		@$(DOCKER_COMPOSE) down --volumes
 		@printf "$(BOLD)$(RED)[clean] $(RESET)Stopped and removed containers, networks, and volumes\n\n"
 
 #	-a, --all: Remove all unused images not just dangling ones
-#	-f, --force: Do not prompt for confirmation
 fclean:	clean
-		@docker system prune --all --force
+		@docker system prune --all
 		@sudo rm -rf $(DATA_PATH)/mariadb/*
 		@sudo rm -rf $(DATA_PATH)/wordpress/*
 		@printf "$(BOLD)$(CYAN)[fclean]: $(RESET)Full clean completed (including images and data)!\n\n"
