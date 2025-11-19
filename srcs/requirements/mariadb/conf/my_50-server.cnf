@@ -1,14 +1,13 @@
 [mysqld]
 
 #	Basic Settings
-user		= mysql
 basedir		= /usr
 datadir		= /var/lib/mysql
 pid-file	= /run/mysqld/mysqld.pid
 socket		= /run/mysqld/mysqld.sock
-
-#	0.0.0.0 ---> All interfaces
-bind-address			= 0.0.0.0
+bind-address	= 0.0.0.0	# All interfaces
+port		= 3306
+user		= mysql
 
 #	Fine Tuning
 #key_buffer_size		= 128M

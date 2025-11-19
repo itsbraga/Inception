@@ -3,10 +3,10 @@ FROM debian:bookworm
 
 #	Update and install NGINX + OpenSSL
 RUN apt-get update && apt-get install -y \
-	nginx \
-	openssl \
-	vim \
-	curl
+			nginx \
+			openssl \
+			vim \
+			curl
 
 # 	Creates directory for SSL certificates
 RUN mkdir -p /etc/nginx/ssl
