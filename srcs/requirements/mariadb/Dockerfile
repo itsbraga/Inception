@@ -4,8 +4,7 @@ FROM debian:bookworm
 # Update and install MariaDB server
 RUN apt-get update && apt-get upgrade -y && \
 	apt-get install -y --no-install-recommends \
-		mariadb-server \
-		vim && \
+		mariadb-server && \
 	apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy custom MariaDB config from the host and put it into the container image

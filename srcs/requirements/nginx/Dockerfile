@@ -6,7 +6,6 @@ RUN apt-get update && apt-get upgrade -y && \
 	apt-get install -y --no-install-recommends \
 		nginx \
 		openssl \
-		vim \
 		curl && \
 	apt-get clean && rm -rf /var/lib/apt/lists/*
 
