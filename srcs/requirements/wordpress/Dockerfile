@@ -7,11 +7,10 @@ RUN apt-get update && apt-get upgrade -y && \
 		wget \
 		php7.3 php-fpm php-mysql \
 		mariadb-client \
-		vim \
-		curl && \
+		vim && \
 	apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Download and install WP-CLI (tool to configure WordPress via command line)
+# Download and install WP-CLI
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -O /usr/local/bin/wp && \
 	chmod +x /usr/local/bin/wp
 
