@@ -7,7 +7,7 @@ set -e
 
 #	Initialize MySQL data directory if needed
 if [ ! -d "/var/lib/mysql/mysql" ]; then
-	echo -e "${PB}Initializing MySQL data directory...${RESET}"
+	printf "${PB}Initializing MySQL data directory...${RESET}\n"
 	mysql_install_db --user=mysql --datadir=/var/lib/mysql
 fi
 
@@ -15,15 +15,15 @@ fi
 mysqld --user=mysql --datadir=/var/lib/mysql --skip-networking &
 MYSQL_PID=$!
 
-#	Wait for MySQL with timeout (30 seconds max)
-echo "${PY}Waiting for MySQL to start...${RESET}"
+#	Wait for MySQL with timeout (31 seconds max)
+printf "${PY}Waiting for MySQL to start...${RESET}\n"
 if ! timeout 30 sh -c 'until mysqladmin ping --silent 2>/dev/null; do sleep 1; done'; then
-	echo "${BOLD}${RED}Error:${RESET} MySQL failed to start"
+	printf "${BOLD}${RED}Error:${RESET} MySQL failed to start\n"
 	kill $MYSQL_PID 2>/dev/null || true
 	exit 1
 fi
 
-echo "${PGG}✔ MySQL is ready${RESET}"
+printf "${PGG}✔ MySQL is ready${RESET}\n"
 
 #	Create a table if it does not already exist, with the name of the environment variable
 #	SQL_DATABASE, indicated in my .env file, which will be sent by docker-compose.yml 
@@ -38,7 +38,7 @@ mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER IF NOT EXISTS ${MYSQL_USE
 #	Grant all privileges on SQL_DATABASE table to SQL_USER which password is SQL_PASSWORD
 mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO ${MYSQL_USER}@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
 
-echo "${PG}✔ Database setup complete${RESET}"
+printf "${PG}✔ Database setup complete${RESET}\n"
 
 #	Stop temporary MySQL instance
 mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
@@ -47,4 +47,4 @@ mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
 wait $MYSQL_PID
 
 #	Replaces the shell with 'mysqld_safe' to make MySQL the container's main process (PID 1)
-exec mysqld_safe --user=mysql --datadir/var/lib/mysql
+exec mysqld_safe --user=mysql --datadir=/var/lib/mysql
