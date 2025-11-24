@@ -8,19 +8,6 @@ set -e
 # Go to WordPress directory
 cd /var/www/wordpress
 
-# Wait for MariaDB to be ready (30 seconds timeout)
-printf "${PY}Waiting for MariaDB to be ready...${RESET}\n"
-timeout=30
-while ! mariadb-admin ping -h"${MYSQL_HOST}" --silent 2>/dev/null; do
-	sleep 1
-	timeout=$((timeout - 1))
-	if [ $timeout -le 0 ]; then
-		printf "${BOLD}${RED}Error:${RESET} MariaDB connection timeout\n"
-		exit 1
-	fi
-done
-printf "${PGG}✔ MariaDB is ready${RESET}\n"
-
 # Configure WordPress only if not already done
 if [ ! -f wp-config.php ]; then
 
@@ -37,7 +24,7 @@ if [ ! -f wp-config.php ]; then
 		--dbname="${MYSQL_DATABASE}" \
 		--dbuser="${MYSQL_USER}" \
 		--dbpass="${MYSQL_PASSWORD}" \
-		--dbhost="${MYSQL_HOST}" \
+		--dbhost="${DB_HOST}" \
 		--skip-check \
 		--allow-root
 
@@ -45,15 +32,15 @@ if [ ! -f wp-config.php ]; then
 	printf "${PB}Installing WordPress...${RESET}\n"
 	wp core install \
 		--path="${WP_PATH}" \
-		--url="https://annabrag@student.42.fr" \
-		--title="${WP_TITLE}" \
+		--url="https://annabrag.42.fr" \
+		--title="★ art&mis' website ★" \
 		--admin_user="${WP_ADMIN_USER}" \
 		--admin_password="${WP_ADMIN_PASSWORD}" \
-		--admin_email="${WP_ADMIN_EMAIL}" \
-		--skip-email \
+		--admin_email="${MYSQL_ADMIN_EMAIL}" \
+#		--skip-email \
 		--allow-root
 
-	# Create second user (non-admin, as required by subject)
+	# Create second user (non-admin)
 	printf "${PB}Creating second user...${RESET}\n"
 	wp user create \
 		"${WP_USER}" \
@@ -73,4 +60,3 @@ chown -R www-data:www-data /var/www/wordpress
 # Start PHP-FPM in foreground mode (PID 1)
 printf "${PGG}Starting PHP-FPM...${RESET}\n"
 exec php-fpm8.2 -F
-

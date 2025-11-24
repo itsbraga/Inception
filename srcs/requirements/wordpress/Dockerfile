@@ -1,6 +1,9 @@
 # Indicates which OS the virtual machine should run on
 FROM debian:bookworm
 
+# Set working directory
+WORKDIR /var/www/wordpress
+
 # Update and install PHP-FPM and necessaries
 RUN apt-get update && apt-get upgrade -y && \
 	apt-get install -y --no-install-recommends \
@@ -42,9 +45,6 @@ RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/wp-setup.sh
 
 # Expose PHP-FPM port to communicate with NGINX
 EXPOSE 9000
-
-# Set working directory
-WORKDIR /var/www/wordpress
 
 # Defines the main command that MUST be executed when a container starts up
 ENTRYPOINT [ "/usr/local/bin/wp-setup.sh" ]
