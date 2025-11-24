@@ -24,7 +24,7 @@ COPY tools/init-db.sh /usr/local/bin/init-db.sh
 #		(**)  runs with group rights or group inheritance (directory)
 #		(***) deletion protection (directories)
 #
-#	mkdir -m 2750	: only mysql user et its group can read
+#	mkdir -m 2750	: only mysql user and its group can read
 #	/var/run/mysqld : directory for MariaDB socket
 #
 RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/init-db.sh && \
@@ -36,6 +36,9 @@ RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/init-db.sh && \
 
 # Port used to communicate with WordPress container
 EXPOSE 3306
+
+HEALTHCHECK --interval=10s --timeout=1s --retries=3 --start-period=30s \
+	CMD mysqladmin -h localhost -u root -p${MYSQL_ROOT_PASSWORD} ping 2>&1 | grep -qE "mysqld is alive"; if [ $? -eq 0 ]; then exit 0; else exit 1; fi
 
 # Defines the main command that MUST be executed when a container starts up
 ENTRYPOINT [ "/usr/local/bin/init-db.sh" ]

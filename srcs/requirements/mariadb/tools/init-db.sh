@@ -15,16 +15,6 @@ fi
 mysqld --user=mysql --datadir=/var/lib/mysql --skip-networking &
 MYSQL_PID=$!
 
-#	Wait for MySQL with timeout (30 seconds max)
-printf "${PY}Waiting for MySQL to start...${RESET}\n"
-if ! timeout 30 sh -c 'until mysqladmin ping --silent 2>/dev/null; do sleep 1; done'; then
-	printf "${BOLD}${RED}Error:${RESET} MySQL failed to start\n"
-	kill $MYSQL_PID 2>/dev/null || true
-	exit 1
-fi
-
-printf "${PGG}✔ MySQL is ready${RESET}\n"
-
 #	Create a table if it does not already exist, with the name of the environment variable
 #	SQL_DATABASE, indicated in my .env file, which will be sent by docker-compose.yml 
 mysql -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;"

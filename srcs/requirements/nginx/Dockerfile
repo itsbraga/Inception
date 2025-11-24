@@ -5,8 +5,7 @@ FROM debian:bookworm
 RUN apt-get update && apt-get upgrade -y && \
 	apt-get install -y --no-install-recommends \
 		nginx \
-		openssl \
-		curl && \
+		openssl && \
 	apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Creates directory for SSL certificates

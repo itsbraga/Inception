@@ -14,6 +14,7 @@ RUN apt-get update && apt-get upgrade -y && \
 		php8.2-mbstring \
 		php8.2-curl \
 		mariadb-client \
+		ca-certificates \
 		curl && \
 	apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -27,8 +28,8 @@ RUN mkdir -p /var/www/wordpress /run/php
 
 # Download and extract WordPress
 RUN curl -O https://wordpress.org/wordpress-6.8.2.tar.gz && \
-	tar -xzf /tmp/wordpress-6.8.2.tar.gz -C /var/www && \
-	rm /tmp/wordpress-6.8.2.tar.gz && \
+	tar -xzf wordpress-6.8.2.tar.gz
+#	rm -rf wordpress-6.8.2.tar.gz
 
 # Set proper permissions after downloading WordPress
 RUN chown -R www-data:www-data /var/www/wordpress && \

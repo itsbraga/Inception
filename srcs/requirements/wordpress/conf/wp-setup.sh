@@ -37,7 +37,6 @@ if [ ! -f wp-config.php ]; then
 		--admin_user="${WP_ADMIN_USER}" \
 		--admin_password="${WP_ADMIN_PASSWORD}" \
 		--admin_email="${MYSQL_ADMIN_EMAIL}" \
-#		--skip-email \
 		--allow-root
 
 	# Create second user (non-admin)
