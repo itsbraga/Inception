@@ -13,7 +13,6 @@ COPY ./conf/my_50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 
 # Copy initialization tool & script
 COPY ./tools/colors.sh /usr/local/bin/colors.sh
-COPY ./tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
 COPY ./tools/db-setup.sh /usr/local/bin/db-setup.sh
 
 # Set proper permissions
@@ -23,7 +22,6 @@ COPY ./tools/db-setup.sh /usr/local/bin/db-setup.sh
 #	- 2750 for /var/log/mysql: logs are sensitive, restrict access
 #
 RUN chmod +x /usr/local/bin/colors.sh \
-		/usr/local/bin/docker-cleanup.sh \
 		/usr/local/bin/db-setup.sh && \
 	mkdir -p -m 2755 /var/run/mysqld && \
 	chown -R mysql:mysql /var/run/mysqld && \

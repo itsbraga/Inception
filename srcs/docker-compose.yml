@@ -1,5 +1,6 @@
 services:
   mariadb:
+    image: mariadb:1.0
     container_name: mariadb
     volumes:
       - mariadb-data:/var/lib/mysql
@@ -19,6 +20,7 @@ services:
       - "3306"
 
   wordpress:
+    image: wordpress:1.0
     container_name: wordpress
     volumes:
       - wordpress-data:/var/www/wordpress
@@ -36,6 +38,7 @@ services:
       - "9000"
 
   nginx:
+    image: nginx:1.0
     container_name: nginx
     volumes:
       - wordpress-data:/var/www/wordpress

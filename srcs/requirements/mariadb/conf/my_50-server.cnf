@@ -1,16 +1,16 @@
 [mysqld]
 
 # Basic Settings
-basedir			= /usr
-datadir			= /var/lib/mysql
-pid-file		= /var/run/mysqld/mysqld.pid
-socket			= /var/run/mysqld/mysqld.sock
-bind-address	= 0.0.0.0	# All interfaces
-port			= 3306
-user			= mysql
+basedir		= /usr
+datadir		= /var/lib/mysql
+pid-file	= /var/run/mysqld/mysqld.pid
+socket		= /var/run/mysqld/mysqld.sock
+bind-address	= 0.0.0.0
+port		= 3306
+user		= mysql
 
 character-set-server	= utf8mb4
-collation-server		= utf8mb4_unicode_ci
+collation-server	= utf8mb4_unicode_ci
 
 # Security
 skip-name-resolve

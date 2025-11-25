@@ -27,17 +27,15 @@ RUN chmod 600 /etc/nginx/ssl/nginx.key && \
 
 # Copy custom NGINX config from the host and put it into the container image
 COPY ./conf/my_nginx.conf /etc/nginx/nginx.conf
-COPY ./tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
 
 # Set proper permissions
-RUN chmod +x /usr/local/bin/docker-cleanup.sh && \
-	chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html
 
 # Expose HTTPS port only
 EXPOSE 443
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
-	CMD curl -f https://localhost:443 -k --silent --show-error || exit 1
+#HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
+#	CMD curl -f https://localhost:443 --insecure --silent --show-error || exit 1
 
 # Start NGINX as PID 1, in foreground (no daemon mode)
 CMD [ "nginx", "-g", "daemon off;" ]

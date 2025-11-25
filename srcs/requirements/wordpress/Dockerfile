@@ -29,18 +29,22 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 	chmod +x wp-cli.phar && \
 	mv wp-cli.phar /usr/local/bin/wp
 
+# Download and extract WordPress
+RUN curl -o /tmp/wordpress.tar.gz https://wordpress.org/latest.tar.gz && \
+	tar -xzf /tmp/wordpress.tar.gz -C /tmp && \
+	mv /tmp/wordpress/* /var/www/wordpress/ && \
+	rm -rf /tmp/wordpress.tar.gz /tmp/wordpress
+
 # Configure PHP-FPM to listen on port 9000 (instead of socket)
 RUN sed -i "s|^listen = .*|listen = 0.0.0.0:9000|" /etc/php/8.2/fpm/pool.d/www.conf && \
 	sed -i "s|^;clear_env = .*|clear_env = no|" /etc/php/8.2/fpm/pool.d/www.conf
 
 # Copy WordPress setup file and tools
 COPY ./tools/colors.sh /usr/local/bin/colors.sh
-COPY ./tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
 COPY ./conf/wp-setup.sh /usr/local/bin/wp-setup.sh
 
 # Give execution rights to everyone
 RUN chmod +x /usr/local/bin/colors.sh \
-	/usr/local/bin/docker-cleanup.sh \
 	/usr/local/bin/wp-setup.sh 
 
 # Expose PHP-FPM port to communicate with NGINX

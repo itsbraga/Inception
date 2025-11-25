@@ -13,8 +13,8 @@ if [ ! -f wp-config.php ]; then
 
 	# Download WordPress core files if not present
 	if [ ! -f wp-load.php ]; then
-		printf "${PB}Downloading WordPress...${RESET}\n"
-		wp core download --allow-root
+    		printf "${PR}⚠ WordPress files missing!${RESET}\n"
+    		exit 1
 	fi
 
 	# Create wp-config.php with database credentials
@@ -33,7 +33,7 @@ if [ ! -f wp-config.php ]; then
 	wp core install \
 		--path="${WP_PATH}" \
 		--url="https://annabrag.42.fr" \
-		--title="★ art&mis' website ★" \
+		--title="★	art&mis' website	★" \
 		--admin_user="${WP_ADMIN_USER}" \
 		--admin_password="${WP_ADMIN_PASSWORD}" \
 		--admin_email="${WP_ADMIN_EMAIL}" \
