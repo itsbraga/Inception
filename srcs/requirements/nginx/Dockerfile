@@ -24,8 +24,11 @@ RUN chmod 600 /etc/nginx/ssl/nginx.key && \
 
 # Copy custom NGINX config from the host and put it into the container image
 COPY ./conf/my_nginx.conf /etc/nginx/nginx.conf
+COPY ./tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
 
-RUN chmod 755 /var/www/html && \
+# Set proper permissions
+RUN chmod +x /usr/local/bin/docker-cleanup.sh && \
+	chmod 755 /var/www/html && \
 	chown -R www-data:www-data /var/www/html
 
 # Expose HTTPS port only

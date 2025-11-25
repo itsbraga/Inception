@@ -8,26 +8,19 @@ RUN apt-get update && apt-get upgrade -y && \
 	apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy custom MariaDB config from the host and put it into the container image
-COPY conf/my_50-server.cnf /etc/mysql/mariadb.conf.d/my_50-server.cnf
+COPY ./conf/my_50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 
 # Copy initialization tool & script
-COPY tools/colors.sh /usr/local/bin/colors.sh
-COPY tools/init-db.sh /usr/local/bin/init-db.sh
+COPY ./tools/colors.sh /usr/local/bin/colors.sh
+COPY ./tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
+COPY ./tools/db-setup.sh /usr/local/bin/db-setup.sh
 
 # Set proper permissions
-#
-#	Beyond classic permissions (rwx), Unix has 3 special bits
-#	Bit position:	  4			2			1
-#			Setuid*		     Setgid**		   Sticky bit***
-#
-#		(*)   runs with owner rights
-#		(**)  runs with group rights or group inheritance (directory)
-#		(***) deletion protection (directories)
 #
 #	mkdir -m 2750	: only mysql user and its group can read
 #	/var/run/mysqld : directory for MariaDB socket
 #
-RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/init-db.sh && \
+RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/docker-cleanup.sh /usr/local/bin/db-setup.sh && \
 	mkdir -p -m 2755 /var/run/mysqld && \
 	chown -R mysql:mysql /var/run/mysqld && \
 	mkdir -p -m 2750 /var/log/mysql && \
@@ -37,8 +30,8 @@ RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/init-db.sh && \
 # Port used to communicate with WordPress container
 EXPOSE 3306
 
-HEALTHCHECK --interval=10s --timeout=1s --retries=3 --start-period=30s \
-	CMD mysqladmin -h localhost -u root -p${MYSQL_ROOT_PASSWORD} ping 2>&1 | grep -qE "mysqld is alive"; if [ $? -eq 0 ]; then exit 0; else exit 1; fi
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=3 \
+	CMD mysqladmin -h localhost -u root -p"${MYSQL_ROOT_PASSWORD}" ping --silent || exit 1
 
 # Defines the main command that MUST be executed when a container starts up
-ENTRYPOINT [ "/usr/local/bin/init-db.sh" ]
+ENTRYPOINT [ "/usr/local/bin/db-setup.sh" ]

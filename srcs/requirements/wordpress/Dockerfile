@@ -39,10 +39,13 @@ RUN chown -R www-data:www-data /var/www/wordpress && \
 RUN sed -i "s|^listen = .*|listen = 0.0.0.0:9000|" /etc/php/8.2/fpm/pool.d/www.conf && \
 	sed -i "s|^;clear_env = .*|clear_env = no|" /etc/php/8.2/fpm/pool.d/www.conf
 
-# Copy WordPress setup file
+# Copy WordPress setup file and tools
 COPY tools/colors.sh /usr/local/bin/colors.sh
+COPY tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
 COPY conf/wp-setup.sh /usr/local/bin/wp-setup.sh
-RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/wp-setup.sh
+
+# Give execution rights to everyone
+RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/docker-cleanup.sh /usr/local/bin/wp-setup.sh 
 
 # Expose PHP-FPM port to communicate with NGINX
 EXPOSE 9000
