@@ -2,7 +2,7 @@
 
 . /usr/local/bin/colors.sh
 
-# Stop the script on error
+# Stop the script on any error
 set -e
 
 # Go to WordPress directory
@@ -36,7 +36,7 @@ if [ ! -f wp-config.php ]; then
 		--title="★ art&mis' website ★" \
 		--admin_user="${WP_ADMIN_USER}" \
 		--admin_password="${WP_ADMIN_PASSWORD}" \
-		--admin_email="${MYSQL_ADMIN_EMAIL}" \
+		--admin_email="${WP_ADMIN_EMAIL}" \
 		--allow-root
 
 	# Create second user (non-admin)

@@ -31,7 +31,6 @@ COPY ./tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
 
 # Set proper permissions
 RUN chmod +x /usr/local/bin/docker-cleanup.sh && \
-	chmod 755 /var/www/html && \
 	chown -R www-data:www-data /var/www/html
 
 # Expose HTTPS port only
