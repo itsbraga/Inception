@@ -1,14 +1,17 @@
-# Indicates which OS the virtual machine should run on
+# Indicate which OS the virtual machine should run on
 FROM debian:bookworm
 
 # Update and install NGINX + OpenSSL
 RUN apt-get update && apt-get upgrade -y && \
 	apt-get install -y --no-install-recommends \
 		nginx \
-		openssl && \
-	apt-get clean && rm -rf /var/lib/apt/lists/*
+		openssl \
+		ca-certificates \
+		curl && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Creates directory for SSL certificates
+# Create directory for SSL certificates
 RUN mkdir -p /etc/nginx/ssl
 
 # Generate self-signed SSL certificate
@@ -34,6 +37,8 @@ RUN chmod +x /usr/local/bin/docker-cleanup.sh && \
 # Expose HTTPS port only
 EXPOSE 443
 
-#	Defines the default (suggestion) command to execute when a container starts up
-#	In this case: starts NGINX in foreground (no daemon mode)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
+	CMD curl -f https://localhost:443 -k --silent --show-error || exit 1
+
+# Start NGINX as PID 1, in foreground (no daemon mode)
 CMD [ "nginx", "-g", "daemon off;" ]

@@ -54,8 +54,10 @@ else
 fi
 
 # Set correct ownership for www-data (PHP-FPM user)
+printf "${PB}Setting correct permissions...${RESET}\n"
 chown -R www-data:www-data /var/www/wordpress
+chmod -R 750 /var/www/wordpress
 
-# Start PHP-FPM in foreground mode (PID 1)
+# Start PHP-FPM as PID 1, in foreground mode
 printf "${PGG}Starting PHP-FPM...${RESET}\n"
 exec php-fpm8.2 -F

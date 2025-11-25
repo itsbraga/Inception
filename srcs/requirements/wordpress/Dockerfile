@@ -1,5 +1,8 @@
-# Indicates which OS the virtual machine should run on
+# Indicate which OS the virtual machine should run on
 FROM debian:bookworm
+
+# Create directories for WordPress and PHP-FPM
+RUN mkdir -p /var/www/wordpress /run/php
 
 # Set working directory
 WORKDIR /var/www/wordpress
@@ -15,40 +18,36 @@ RUN apt-get update && apt-get upgrade -y && \
 		php8.2-curl \
 		mariadb-client \
 		ca-certificates \
-		curl && \
-	apt-get clean && rm -rf /var/lib/apt/lists/*
+		curl \
+		netcat-openbsd && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Download and install WP-CLI
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
 	chmod +x wp-cli.phar && \
 	mv wp-cli.phar /usr/local/bin/wp
 
-# Create directories for WordPress and PHP-FPM
-RUN mkdir -p /var/www/wordpress /run/php
-
-# Download and extract WordPress
-RUN curl -O https://wordpress.org/wordpress-6.8.2.tar.gz && \
-	tar -xzf wordpress-6.8.2.tar.gz
-#	rm -rf wordpress-6.8.2.tar.gz
-
-# Set proper permissions after downloading WordPress
-RUN chown -R www-data:www-data /var/www/wordpress && \
-	chmod -R 750 /var/www/wordpress
-
 # Configure PHP-FPM to listen on port 9000 (instead of socket)
 RUN sed -i "s|^listen = .*|listen = 0.0.0.0:9000|" /etc/php/8.2/fpm/pool.d/www.conf && \
 	sed -i "s|^;clear_env = .*|clear_env = no|" /etc/php/8.2/fpm/pool.d/www.conf
 
 # Copy WordPress setup file and tools
-COPY tools/colors.sh /usr/local/bin/colors.sh
-COPY tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
-COPY conf/wp-setup.sh /usr/local/bin/wp-setup.sh
+COPY ./tools/colors.sh /usr/local/bin/colors.sh
+COPY ./tools/docker-cleanup.sh /usr/local/bin/docker-cleanup.sh
+COPY ./conf/wp-setup.sh /usr/local/bin/wp-setup.sh
 
 # Give execution rights to everyone
-RUN chmod +x /usr/local/bin/colors.sh /usr/local/bin/docker-cleanup.sh /usr/local/bin/wp-setup.sh 
+RUN chmod +x /usr/local/bin/colors.sh \
+	/usr/local/bin/docker-cleanup.sh \
+	/usr/local/bin/wp-setup.sh 
 
 # Expose PHP-FPM port to communicate with NGINX
 EXPOSE 9000
+
+# Verify if PHP-FPM is listening on port 9000
+HEALTHCHECK --interval=10s --timeout=5s --start-period=40s --retries=3 \
+	CMD nc -z localhost 9000 || exit 1
 
 # Defines the main command that MUST be executed when a container starts up
 ENTRYPOINT [ "/usr/local/bin/wp-setup.sh" ]
