@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export RESET="\033[0m"
+export NC="\033[0m"
 
 export BOLD="\033[1m"
 export ITAL="\033[3m"

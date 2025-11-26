@@ -5,15 +5,29 @@
 # Stop the script on any error
 set -e
 
-printf "${BOLD}${PP}=== MariaDB Initialization ===${RESET}\n"
+printf "${BOLD}${PP}=== MariaDB Initialization ===${NC}\n"
+
+if [ -f /run/secrets/mysql_password.txt ]; then
+	MYSQL_PASSWORD=$(cat /run/secrets/mysql_password.txt)
+else
+	printf "${BOLD}${RED}Error:${NC} Secret mysql_password not found\n"
+	exit 1
+fi
+
+if [ -f /run/secrets/mysql_root_password.txt ]; then
+	MYSQL_ROOT_PASSWORD=$(cat /run/secrets/mysql_root_password.txt)
+else
+	printf "${BOLD}${RED}Error:${NC} Secret mysql_root_password not found\n"
+	exit 1
+fi
 
 # Check if MariaDB has already been initialized
-if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
-	printf "${PY}First-time initialization detected${RESET}\n"
-	printf "${PB}[1/2] Initializing MySQL data directory...${RESET}\n"
+if [ ! -d "/var/lib/mysql/${MYSQL_DBNAME}" ]; then
+	printf "${PY}First-time initialization detected${NC}\n"
+	printf "${PB}[1/2] Initializing MySQL data directory...${NC}\n"
 	mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
-	printf "${PB}[2/2] Configuring database (bootstrap mode)...${RESET}\n"
+	printf "${PB}[2/2] Configuring database (bootstrap mode)...${NC}\n"
 	mysqld --user=mysql --bootstrap << EOF
 
 	-- Switch to the mysql system database
@@ -29,16 +43,16 @@ if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
 	DROP DATABASE IF EXISTS test;
 	DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 
-	-- DATABASE CREATION: Create WordPress database
-	CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+	-- DATABASE CREATION: Create WordPress ('inception_db') database
+	CREATE DATABASE IF NOT EXISTS \`${MYSQL_DBNAME}\`;
 
 	-- USER CREATION: WordPress user for remote and local connections
 	CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 	CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';
 
 	-- PRIVILEGES: Grant full access to WordPress database for remote and local user
-	GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%'; 
-	GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'localhost'; 
+	GRANT ALL PRIVILEGES ON \`${MYSQL_DBNAME}\`.* TO '${MYSQL_USER}'@'%'; 
+	GRANT ALL PRIVILEGES ON \`${MYSQL_DBNAME}\`.* TO '${MYSQL_USER}'@'localhost'; 
 
 	-- ROOT SECURITY: Set root password
 	UPDATE mysql.user SET Password=PASSWORD('${MYSQL_ROOT_PASSWORD}') WHERE User='root';
@@ -50,13 +64,12 @@ if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
 	-- Apply all changes
 	FLUSH PRIVILEGES;
 EOF
-
-	printf "${PG}✔ Database setup complete${RESET}\n"
+	printf "${PG}✔ Database setup complete${NC}\n"
 else
-	printf "${PB}Database already initialized, skipping setup${RESET}\n"
+	printf "${PB}Database already initialized, skipping setup${NC}\n"
 fi
 
-printf "${BOLD}${PINK}\n=== Starting MariaDB Server ===${RESET}\n"
+printf "${BOLD}${PINK}\n=== Starting MariaDB Server ===${NC}\n"
 
 # Start MariaDB server as PID 1
 #

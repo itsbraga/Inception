@@ -2,58 +2,69 @@ services:
   mariadb:
     image: mariadb:1.0
     container_name: mariadb
+    pull_policy: never
+    environment:
+      MYSQL_DBNAME: ${MYSQL_DBNAME}
+      MYSQL_USER: ${MYSQL_USER}
+    secrets:
+      - db_password
+      - db_root_password
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
     volumes:
       - mariadb-data:/var/lib/mysql
     networks:
       - inception
-    env_file: ./.env
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    build:
-      context: ./requirements/mariadb
-      dockerfile: Dockerfile
-    restart: unless-stopped
     expose:
       - "3306"
+    restart: unless-stopped
 
   wordpress:
     image: wordpress:1.0
     container_name: wordpress
+    pull_policy: never
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      WP_PATH: ${WP_PATH}
+      DB_HOST: ${DB_HOST}
+      WP_ADMIN_USER: ${WP_ADMIN_USER}
+      WP_USER: ${WP_USER}
+    secrets:
+      - wp_admin_password
+      - wp_admin_email
+      - wp_user_password
+      - wp_user_email
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
     volumes:
       - wordpress-data:/var/www/wordpress
     networks:
       - inception
-    depends_on:
-      mariadb:
-        condition: service_healthy
-    env_file: ./.env
-    build:
-      context: ./requirements/wordpress
-      dockerfile: Dockerfile
-    restart: unless-stopped
     expose:
       - "9000"
+    restart: unless-stopped
 
   nginx:
     image: nginx:1.0
     container_name: nginx
+    pull_policy: never
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
     volumes:
       - wordpress-data:/var/www/wordpress
     networks:
       - inception
-    depends_on:
-      wordpress:
-        condition: service_healthy
-    env_file: ./.env
-    build:
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
-    restart: unless-stopped
     ports:
       - "443:443"
+    restart: unless-stopped
 
 volumes:
   mariadb-data:
@@ -69,6 +80,20 @@ volumes:
       type: none
       o: bind
       device: /home/annabrag/data/wordpress
+
+secrets:
+  db_password:
+    file: ../secrets/mysql_password.txt
+  db_root_password:
+    file: ../secrets/mysql_root_password.txt
+  wp_admin_password:
+    file: ../secrets/wp_admin_password.txt
+  wp_admin_email:
+    file: ../secrets/wp_admin_email.txt
+  wp_user_password:
+    file: ../secrets/wp_user_password.txt
+  wp_user_email:
+    file: ../secrets/wp_user_email.txt
 
 networks:
   inception:
