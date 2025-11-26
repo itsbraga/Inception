@@ -31,24 +31,34 @@ DATA_PATH		= /home/$(USER)/data
 all: up
 
 setup:
-	@mkdir -p $(DATA_PATH)/mariadb/
-	@mkdir -p $(DATA_PATH)/wordpress/
+	@mkdir -p $(DATA_PATH)/mariadb
+	@mkdir -p $(DATA_PATH)/wordpress
 
 up: setup
 	@$(DOCKER_COMPOSE) up -d --build
 	@printf "\n$(BOLD)$(PG)[up]$(NC)$(PG) Built all containers' image in the background$(NC)\n\n"
 
 down:
+	@$(DOCKER_COMPOSE) down
+	@printf "\n$(BOLD)$(PY)[down]$(NC)$(PY) Stopped containers$(NC)\n\n"
+
+clean:
 	@$(DOCKER_COMPOSE) down --volumes
-	@printf "\n$(BOLD)$(PO)[down -v]$(NC)$(PO) Stopped and removed containers, networks and volumes$(NC)\n\n"
+	@printf "\n$(BOLD)$(PO)[clean]$(NC)$(PO) Stopped and cleaned containers, project network and volumes$(NC)\n\n"
 
-fclean: down
-	@docker system prune --all --force
-	@sudo rm -rf $(DATA_PATH)/mariadb/*
-	@sudo rm -rf $(DATA_PATH)/wordpress/*
-	@printf "\n$(BOLD)$(RED)[system prune -a]:$(NC)$(RED) All unused images, containers, and volumes have been purged from the system$(NC)\n\n"
+fclean: clean
+	@docker image rm -f mariadb:1.0
+	@docker image rm -f wordpress:1.0
+	@docker image rm -f nginx:1.0
+	@docker volume rm -f inception_mariadb-data
+	@docker volume rm -f inception_wordpress-data
+	@docker builder prune --all --force
+	@rm -rf $(DATA_PATH)/mariadb/*
+	@rm -rf $(DATA_PATH)/wordpress/*
+	@printf "\n$(BOLD)$(RED)[fclean]$(NC)$(RED) All unused images, containers, and volumes have been purged from the system$(NC)\n\n"
 
-re: fclean all
+re: fclean
+	@make --no-print-directory all
 
 # Show container status
 ps:

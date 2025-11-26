@@ -1,3 +1,5 @@
+name: inception
+
 services:
   mariadb:
     image: mariadb:1.0
@@ -28,11 +30,15 @@ services:
       mariadb:
         condition: service_healthy
     environment:
-      WP_PATH: ${WP_PATH}
+      MYSQL_DBNAME: ${MYSQL_DBNAME}
+      MYSQL_USER: ${MYSQL_USER}
       DB_HOST: ${DB_HOST}
+      WP_PATH: ${WP_PATH}
+      URL: ${URL}
       WP_ADMIN_USER: ${WP_ADMIN_USER}
       WP_USER: ${WP_USER}
     secrets:
+      - db_password
       - wp_admin_password
       - wp_admin_email
       - wp_user_password

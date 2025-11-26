@@ -7,15 +7,15 @@ set -e
 
 printf "${BOLD}${PP}=== MariaDB Initialization ===${NC}\n"
 
-if [ -f /run/secrets/mysql_password.txt ]; then
-	MYSQL_PASSWORD=$(cat /run/secrets/mysql_password.txt)
+if [ -f /run/secrets/db_password ]; then
+	MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 else
 	printf "${BOLD}${RED}Error:${NC} Secret mysql_password not found\n"
 	exit 1
 fi
 
-if [ -f /run/secrets/mysql_root_password.txt ]; then
-	MYSQL_ROOT_PASSWORD=$(cat /run/secrets/mysql_root_password.txt)
+if [ -f /run/secrets/db_root_password ]; then
+	MYSQL_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
 else
 	printf "${BOLD}${RED}Error:${NC} Secret mysql_root_password not found\n"
 	exit 1

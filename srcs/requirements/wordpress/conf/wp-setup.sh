@@ -5,29 +5,36 @@
 # Stop the script on any error
 set -e
 
-if [ -f /run/secrets/wp_admin_password.txt ]; then
-	WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password.txt)
+if [ -f /run/secrets/db_password ]; then
+	MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+else
+	printf "${BOLD}${RED}Error:${NC} Secret mysql_password not found\n"
+	exit 1
+fi
+
+if [ -f /run/secrets/wp_admin_password ]; then
+	WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
 else
 	printf "${BOLD}${RED}Error:${NC} Secret wp_admin_password not found\n"
 	exit 1
 fi
 
-if [ -f /run/secrets/wp_admin_email.txt ]; then
-	WP_ADMIN_EMAIL=$(cat /run/secrets/wp_admin_email.txt)
+if [ -f /run/secrets/wp_admin_email ]; then
+	WP_ADMIN_EMAIL=$(cat /run/secrets/wp_admin_email)
 else
 	printf "${BOLD}${RED}Error:${NC} Secret wp_admin_email not found\n"
 	exit 1
 fi
 
-if [ -f /run/secrets/wp_user_password.txt ]; then
-	WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password.txt)
+if [ -f /run/secrets/wp_user_password ]; then
+	WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 else
 	printf "${BOLD}${RED}Error:${NC} Secret wp_user_password not found\n"
 	exit 1
 fi
 
-if [ -f /run/secrets/wp_user_email.txt ]; then
-	WP_USER_EMAIL=$(cat /run/secrets/wp_user_email.txt)
+if [ -f /run/secrets/wp_user_email ]; then
+	WP_USER_EMAIL=$(cat /run/secrets/wp_user_email)
 else
 	printf "${BOLD}${RED}Error:${NC} Secret wp_user_email not found\n"
 	exit 1
@@ -60,7 +67,7 @@ if [ ! -f wp-config.php ]; then
 	printf "${PB}Installing WordPress...${NC}\n"
 	wp core install \
 		--path="${WP_PATH}" \
-		--url="https://annabrag.42.fr" \
+		--url="${URL}" \
 		--title="⋆˙⟡&nbsp;&nbsp;&nbsp;art&mis' website&nbsp;&nbsp;&nbsp;₍^. .^₎⟆" \
 		--admin_user="${WP_ADMIN_USER}" \
 		--admin_password="${WP_ADMIN_PASSWORD}" \
