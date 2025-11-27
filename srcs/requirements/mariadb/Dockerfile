@@ -6,7 +6,7 @@ RUN apt-get update && apt-get upgrade -y && \
 	apt-get install -y --no-install-recommends \
 		mariadb-server && \
 	apt-get clean && \
-	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+	rm -rf /var/lib/apt/lists/* /var/lib/mysql/* /tmp/* /var/tmp/*
 
 # Copy custom MariaDB config from the host and put it into the container image
 COPY ./conf/my_50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf

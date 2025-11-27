@@ -46,18 +46,20 @@ clean:
 	@$(DOCKER_COMPOSE) down --volumes
 	@printf "\n$(BOLD)$(PO)[clean]$(NC)$(PO) Stopped and cleaned containers, project network and volumes$(NC)\n\n"
 
-fclean: clean
-	@docker image rm -f mariadb:1.0
-	@docker image rm -f wordpress:1.0
-	@docker image rm -f nginx:1.0
-	@docker volume rm -f inception_mariadb-data
-	@docker volume rm -f inception_wordpress-data
+fclean:
+	@docker stop $$(docker ps -qa) 2>/dev/null || true
+	@docker rm $$(docker ps -qa) 2>/dev/null || true
+	@docker rmi -f $$(docker images -qa) 2>/dev/null || true
+	@docker volume rm $$(docker volume ls -q) 2>/dev/null || true
+	@docker network rm $$(docker network ls -q) 2>/dev/null || true
 	@docker builder prune --all --force
 	@rm -rf $(DATA_PATH)/mariadb/*
 	@rm -rf $(DATA_PATH)/wordpress/*
 	@printf "\n$(BOLD)$(RED)[fclean]$(NC)$(RED) All unused images, containers, and volumes have been purged from the system$(NC)\n\n"
 
-re: fclean
+re:
+	@make --no-print-directory fclean
+	@sleep 5
 	@make --no-print-directory all
 
 # Show container status
