@@ -57,9 +57,7 @@ fclean:
 	@rm -rf $(DATA_PATH)/wordpress/*
 	@printf "\n$(BOLD)$(RED)[fclean]$(NC)$(RED) All unused images, containers, and volumes have been purged from the system$(NC)\n\n"
 
-re:
-	@make --no-print-directory fclean
-	@sleep 5
+re: fclean
 	@make --no-print-directory all
 
 # Show container status
