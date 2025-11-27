@@ -34,8 +34,8 @@ RUN chown -R www-data:www-data /var/www/html
 # Expose HTTPS port only
 EXPOSE 443
 
-#HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
-#	CMD curl -f https://localhost:443 --insecure --silent --show-error || exit 1
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
+	CMD curl -f https://localhost:443 --insecure --silent --show-error || exit 1
 
 # Start NGINX as PID 1, in foreground (no daemon mode)
 CMD [ "nginx", "-g", "daemon off;" ]
